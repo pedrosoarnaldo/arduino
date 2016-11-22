@@ -18,11 +18,11 @@ void setup() {
   pinMode(S2_Yellow_Led, OUTPUT);
   pinMode(S2_Green_Led, OUTPUT);
   
-  digitalWrite(S1_Red_Led, LOW);
+  digitalWrite(S1_Red_Led, HIGH);
   digitalWrite(S1_Yellow_Led, LOW);
   digitalWrite(S1_Green_Led, LOW);
   
-  digitalWrite(S2_Red_Led, LOW);
+  digitalWrite(S2_Red_Led, HIGH);
   digitalWrite(S2_Yellow_Led, LOW);
   digitalWrite(S2_Green_Led, LOW);
 
@@ -32,8 +32,11 @@ void setup() {
 void loop() {
   
   // Control the Semaphore 
-  digitalWrite(S2_Red_Led, LOW);
+
   digitalWrite(S1_Red_Led, HIGH);
+  delay(1000);
+  digitalWrite(S2_Red_Led, LOW);
+
   digitalWrite(S2_Green_Led, HIGH);
   delay(4000);
   
@@ -43,6 +46,7 @@ void loop() {
   digitalWrite(S2_Yellow_Led, LOW);
 
   digitalWrite(S2_Red_Led, HIGH);
+  delay(1000);
   digitalWrite(S1_Red_Led, LOW);
   digitalWrite(S1_Green_Led, HIGH);
   delay(4000);
