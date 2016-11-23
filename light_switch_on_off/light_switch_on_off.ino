@@ -11,13 +11,21 @@ void setup() {
   digitalWrite(led, LOW);
 }
 
+boolean vstatus=LOW;
 // the loop routine runs over and over again forever:
 void loop() {
 
-  if (digitalRead(button) == LOW) {
-    digitalWrite(led, HIGH);   // turn the LED on (HIGH is the voltage level)
-    delay(4000);               // wait for a second
-    digitalWrite(led, LOW);    // turn the LED off by making the voltage LOW
+if (digitalRead(button) == LOW) {
+
+      delay(250);
+      
+      if (vstatus == LOW) {
+        vstatus = HIGH;
+      }
+      else {
+        vstatus = LOW;
+      }
+    digitalWrite(led, vstatus);   // turn the LED on (HIGH is the voltage level)
   }
   
 }
