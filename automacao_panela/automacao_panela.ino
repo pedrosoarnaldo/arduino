@@ -6,6 +6,7 @@
 #define BotaoBomba 5
 #define LedResistencia 6
 #define LedBomba 4
+#define LedTemperatura 3
 
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
@@ -22,9 +23,11 @@ void setup() {
 
  pinMode(LedResistencia, OUTPUT);
  pinMode(LedBomba, OUTPUT);
+ pinMode(LedTemperatura, OUTPUT);
 
  digitalWrite(LedResistencia, LOW);
  digitalWrite(LedBomba, LOW);
+ digitalWrite(LedTemperatura, LOW);
  
  sensors.begin();
  Serial.begin(9600);
@@ -44,6 +47,7 @@ float setTemperature() {
 void loop() {
   float celsus = 0;
   float setTemp = 0;
+  int contDelay = 5000;   //Tempo que a resistência ficará desligada esperando a temperatura abaixar - 5 minutos
   
   // put your main code here, to run repeatedly:
   celsus = getTemperature();
@@ -74,18 +78,21 @@ void loop() {
 
   if (EstadoBotaoResistencia == 1) { 
     if (celsus >= setTemp) {
-      digitalWrite(LedResistencia, LOW);
-      EstadoBotaoResistencia = 0;    
+      digitalWrite(LedTemperatura, HIGH);
       // Desligar a Resistência
-      
+      for (int i = 0; i <= contDelay; i++) {
+          celsus = getTemperature();
+          setTemp = setTemperature();
+          Serial.println(celsus);
+          Serial.println(setTemp);
+        delay(1);  
+      }            
     } else {
-      digitalWrite(LedResistencia, HIGH);
-      EstadoBotaoResistencia = 1;
-      // Ligar a Resistência        
+      digitalWrite(LedTemperatura, LOW);
+      // Ligar a Resistência                
     }
-
   }
   
-  delay(90);
-  
+  delay(100);
+    
 }
