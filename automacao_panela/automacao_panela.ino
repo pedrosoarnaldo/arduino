@@ -14,11 +14,27 @@ void setup() {
 
 }
 
-void loop() {
-  // put your main code here, to run repeatedly:
+float getTemperature() {  
   sensors.requestTemperatures();
   Celsus = sensors.getTempCByIndex(0);
-  Serial.println(Celsus);
+  return Celsus;
+}
+
+float setTemperature() {
+  return float(analogRead(A0)/10);
+}
+
+void loop() {
+  float celsus = 0;
+  float setTemp = 0;
+  
+  // put your main code here, to run repeatedly:
+  celsus = getTemperature();
+  setTemp = setTemperature();
+
+  Serial.println(celsus);
+  Serial.println(setTemp);
+  
   delay(1000);
 
 }
