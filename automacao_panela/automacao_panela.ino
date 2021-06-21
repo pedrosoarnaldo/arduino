@@ -68,9 +68,24 @@ void loop() {
     EstadoBotaoBomba = 0;
     }
   }
-   
+
   Serial.println(celsus);
   Serial.println(setTemp);
+
+  if (EstadoBotaoResistencia == 1) { 
+    if (celsus >= setTemp) {
+      digitalWrite(LedResistencia, LOW);
+      EstadoBotaoResistencia = 0;    
+      // Desligar a Resistência
+      
+    } else {
+      digitalWrite(LedResistencia, HIGH);
+      EstadoBotaoResistencia = 1;
+      // Ligar a Resistência        
+    }
+
+  }
+  
   delay(100);
   
 }
