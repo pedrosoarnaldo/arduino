@@ -1,7 +1,9 @@
+#include <LCDIC2.h>
+
+
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include <Wire.h>
-#include <LiquidCrystal_I2C.h>
 
 
 // Portas Digitais
@@ -15,15 +17,13 @@
 #define ONE_WIRE_BUS 2        //Amarelo
 
 // DEFINIÇÕES
-//#define endereco  0x27 // Endereços comuns: 0x27, 0x3F
-//#define colunas   16
-//#define linhas    2
-
-//LiquidCrystal_I2C lcd(endereco, colunas, linhas);
-
+#define endereco  0x27 // Endereços comuns: 0x27, 0x3F
+#define colunas   16
+#define linhas    2
 
 // Portas Analógicas
 #define Potenciometro A0
+LCDIC2 lcd(0x27, 16, 2);
 
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
@@ -49,28 +49,13 @@ void setup() {
  digitalWrite(LedTemperatura, LOW);
  digitalWrite(ReleBomba, LOW);
 
-/*
-  lcd.init(); // INICIA A COMUNICAÇÃO COM O DISPLAY
-  lcd.backlight(); // LIGA A ILUMINAÇÃO DO DISPLAY
-  lcd.clear(); // LIMPA O DISPLAY
-
-  lcd.print("- Ola, Mundo! -");
-  delay(5000); // DELAY DE 5 SEGUNDOS
-  lcd.setCursor(0, 1); // POSICIONA O CURSOR NA PRIMEIRA COLUNA DA LINHA 2
-  lcd.print("Fim do Setup ()");
-  delay(5000); // DELAY DE 5 SEGUNDOS
-  
-  lcd.noBacklight(); // DESLIGA A ILUMINAÇÃO DO DISPLAY
-  delay(2000); // DELAY DE 2 SEGUNDOS
-  lcd.backlight(); // LIGA A ILUMINAÇÃO DO DISPLAY
-  delay(2000); // DELAY DE 2 SEGUNDOS
-  
-  lcd.clear(); // LIMPA O DISPLAY
-  lcd.noBacklight(); // DESLIGA A ILUMINAÇÃO DO DISPLAY
-*/
-
  sensors.begin();
  Serial.begin(9600);
+
+ lcd.begin();
+ lcd.print("Iniciando");
+ delay(3000);
+ lcd.clear();
 
 }
 
@@ -87,11 +72,25 @@ float setTemperature() {
 void loop() {
   float celsus = 0;
   float setTemp = 0;
-  int contDelay = 5000;   //Tempo que a resistência ficará desligada esperando a temperatura abaixar - 5 minutos
+  int controle = 0;   //Tempo que a resistência ficará desligada esperando a temperatura abaixar
   
   // put your main code here, to run repeatedly:
   celsus = getTemperature();
   setTemp = setTemperature();
+
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("Mosto");
+  lcd.setCursor(11, 0);
+  lcd.print("Temp.");
+
+  lcd.setCursor(0, 1);
+  String strCelsus = String(celsus, 2);
+  lcd.print(strCelsus);
+  
+  lcd.setCursor(11, 1);
+  String strTemp = String(setTemp);
+  lcd.print(strTemp);
 
   if ((digitalRead(BotaoResistencia) == HIGH) && (EstadoBotaoResistencia == 0)) {
     EstadoBotaoResistencia = 1;
@@ -121,16 +120,40 @@ void loop() {
   Serial.println(setTemp);
 
   if (EstadoBotaoResistencia == 1) { 
+
     if (celsus >= setTemp) {
       digitalWrite(LedTemperatura, HIGH);
       digitalWrite(ReleResistencia, LOW);
-      for (int i = 0; i <= contDelay; i++) {
+      controle = 1;
+
+      while (controle == 1 ) {
+        
           celsus = getTemperature();
           setTemp = setTemperature();
+          lcd.clear();
+          lcd.setCursor(0,0);
+          lcd.print("Mosto");
+          lcd.setCursor(11, 0);
+          lcd.print("Temp.");
+
+          lcd.setCursor(0, 1);
+          String strCelsus = String(celsus, 2);
+          lcd.print(strCelsus);
+  
+          lcd.setCursor(11, 1);
+          String strTemp = String(setTemp);
+          lcd.print(strTemp);
+
           Serial.println(celsus);
           Serial.println(setTemp);
-        delay(1);  
-      }            
+          delay(150);
+
+          if (celsus < (setTemp -1)) {
+            controle = 0;
+          }
+          
+       }  
+              
     } else {
       digitalWrite(LedTemperatura, LOW);
       digitalWrite(ReleResistencia, HIGH);                
@@ -138,11 +161,5 @@ void loop() {
   }
   
   delay(150);
-
-/*  lcd.clear();
-  lcd.print("- Ola, Mundo! -");
-  lcd.setCursor(0, 1); // POSICIONA O CURSOR NA PRIMEIRA COLUNA DA LINHA 2
-  lcd.print("Fim do Setup ()");
-*/
 
 }
