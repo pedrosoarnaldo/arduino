@@ -53,7 +53,7 @@ void setup() {
  Serial.begin(9600);
 
  lcd.begin();
- lcd.print("Iniciando");
+ lcd.print("Iniciando - v2");
  delay(3000);
  lcd.clear();
 
@@ -129,59 +129,46 @@ void loop() {
   Serial.println(setTemp);
 
 
-  if (EstadoBotaoResistencia == 1) { 
+  if (EstadoBotaoResistencia == 1) {
 
-    if (celsus >= setTemp) {
-      digitalWrite(LedTemperatura, HIGH);
-      digitalWrite(ReleResistencia, LOW);
-      controle = 1;
+     celsus = getTemperature();
+     setTemp = setTemperature();
 
-      while (controle == 1 ) {
+     String strCelsus = String(celsus, 2);
+     String strTemp = String(setTemp);
 
-          while ((celsus >= setTemp - 3) && (celsus <= setTemp)) {
- 
+     show_lcd(strCelsus, strTemp);
+
+     while ((celsus + 0.55) < setTemp ) {
+            digitalWrite(LedTemperatura, LOW);
+            digitalWrite(ReleResistencia, HIGH);
+            digitalWrite(LedResistencia, HIGH);
+
+            celsus = getTemperature();
+
             String strCelsus = String(celsus, 2);
-            String strTemp = String(setTemp);
-
+     
             show_lcd(strCelsus, strTemp);
 
             Serial.println(celsus);
             Serial.println(setTemp);
 
-            digitalWrite(ReleResistencia, LOW);
-            delay(50);
-            digitalWrite(ReleResistencia, HIGH);
-            delay(65);
+            delay(150);
 
-            celsus = getTemperature();
-            setTemp = setTemperature();
 
-          }
-        
-          celsus = getTemperature();
-          setTemp = setTemperature();
- 
-          String strCelsus = String(celsus, 2);
-          String strTemp = String(setTemp);
+            if (celsus >= setTemp - 2) {
+              delay(6500); // fica 6.5 segundos ligado
+              digitalWrite(ReleResistencia, LOW);
+              digitalWrite(LedResistencia, LOW);
+              delay(4500); // fica 5 segundos desligado
+            }
+      }
 
-          show_lcd(strCelsus, strTemp);
-
-          Serial.println(celsus);
-          Serial.println(setTemp);
-          delay(150);
-
-          if (celsus < (setTemp -1)) {
-            controle = 0;
-          }
-          
-       }  
-              
-    } else {
+   digitalWrite(LedTemperatura, HIGH);
+   
+   } else {
       digitalWrite(LedTemperatura, LOW);
-      digitalWrite(ReleResistencia, HIGH);                
+      digitalWrite(ReleResistencia, LOW);                
     }
-  }
   
-  delay(150);
-
 }
